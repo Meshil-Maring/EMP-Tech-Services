@@ -1,5 +1,7 @@
 import { useRef, useState } from "react";
+import { Toaster, toast } from "react-hot-toast";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 type Errors = {
   name?: string;
@@ -16,10 +18,13 @@ const Signup = () => {
 
   const [errors, setErrors] = useState<Errors>({});
 
+  // Navigate
+  const navigate = useNavigate();
+
   // password Regex
   const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{6,}$/;
 
-  const formHandler = (e: React.FormEvent<HTMLFormElement>) => {
+  const formHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const form = e.currentTarget;
@@ -62,9 +67,32 @@ const Signup = () => {
       passwordRef.current?.focus();
     } else if (newErrors.confirmPassword) {
       confirmPasswordRef.current?.focus();
-    } else {
-      // Success
-      form.reset();
+    }
+
+    // When form is allow to submit
+    else {
+      try {
+        // Response from backend
+        const response = await fetch("http://localhost:5000/api/users", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userName, email, password }),
+        });
+
+        const data = await response.json();
+
+        if (data.status == 409) {
+          toast.error(data.error);
+        } else {
+          toast.success(data.message);
+          form.reset();
+          navigate("/");
+        }
+      } catch (err) {
+        console.log(err);
+      }
+
+      // form.reset();
     }
   };
 
@@ -137,6 +165,8 @@ const Signup = () => {
           </Link>
         </p>
       </form>
+
+      <Toaster position="bottom-center"></Toaster>
     </section>
   );
 };
