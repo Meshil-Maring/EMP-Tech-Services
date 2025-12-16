@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import mail from "./src/services/mail.js";
+import usersRoute from "./src/routes/users.js";
 
 import dotenv from "dotenv";
 
@@ -19,5 +20,7 @@ app.post("/send", (req, res) => {
 
   mail(data);
 });
+
+app.use("/api/users", usersRoute);
 
 app.listen(PORT, () => console.log("Server port: ", PORT));
