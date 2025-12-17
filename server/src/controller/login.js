@@ -15,12 +15,8 @@ export const login = async (req, res) => {
 
   if (!validPass) return res.status(401).json({ error: "Wrong password!" });
 
-  console.log(req.session);
-
   // Create session
   req.session.userId = user.id;
-
-  console.log(req.session);
 
   req.session.save(() => {
     res.status(200).json({
