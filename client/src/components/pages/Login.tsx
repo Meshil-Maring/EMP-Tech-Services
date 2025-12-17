@@ -54,15 +54,16 @@ const Login = () => {
     else {
       try {
         // Response from backend
-        const response = await fetch("http://localhost:5000/api/login", {
+        const response = await fetch("http://localhost:5000/auth/log-in", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          credentials: "include",
           body: JSON.stringify({ email, password }),
         });
 
         const data = await response.json();
 
-        if (data.status == 409) {
+        if (response.status == 404 || response.status == 401) {
           toast.error(data.error);
         } else {
           toast.success(data.message);
