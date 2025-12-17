@@ -46,16 +46,9 @@ app.use(
 
 app.use("/auth", usersRoute);
 
-app.get("/check-session", (req, res) => {
-  res.json({
-    session: req.session,
-    userId: req.session.userId,
-  });
-});
-
 // Protected route
-app.get("/protected", isAuth, (req, res) => {
-  res.json({ message: "Welcome" });
+app.get("/home", isAuth, (req, res) => {
+  res.status(443).json({ userid: req.session.userId });
 });
 
 // Public route
