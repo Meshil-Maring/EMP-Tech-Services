@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
+import { Link } from "react-router-dom";
 
 import { server_url } from "../../utils/url";
 import { DynamicIcon } from "lucide-react/dynamic";
@@ -118,7 +119,7 @@ const Header = ({ onHome, onServices, onPricing, onContact }: HeaderProps) => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="absolute top-16 left-0 w-full bg-black px-8 py-10"
+            className="absolute flex flex-col gap-8 top-16 left-0 w-full bg-black px-8 py-10 justify-center items-center"
           >
             <ul className="flex flex-col items-center space-y-5">
               {navItems.map((item, i) => (
@@ -130,16 +131,20 @@ const Header = ({ onHome, onServices, onPricing, onContact }: HeaderProps) => {
                   {item.label}
                 </li>
               ))}
-
-              <button
-                onClick={isAuth ? logOutHandler : sigupHandler}
-                className={` ${
-                  isAuth ? "bg-red-700" : "bg-blue-500"
-                } p-3 w-48 rounded-full`}
-              >
-                {isAuth ? "Log out" : "Sign up"}
-              </button>
             </ul>
+
+            <ul>
+              <Link to={"/transaction"}>My transaction</Link>
+            </ul>
+
+            <button
+              onClick={isAuth ? logOutHandler : sigupHandler}
+              className={` ${
+                isAuth ? "bg-red-700" : "bg-blue-500"
+              } p-3 w-48 rounded-full `}
+            >
+              {isAuth ? "Log out" : "Sign up"}
+            </button>
           </motion.nav>
         )}
       </AnimatePresence>
