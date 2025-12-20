@@ -1,7 +1,8 @@
 import { useRef, useState } from "react";
 import { Toaster, toast } from "react-hot-toast";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { DynamicIcon } from "lucide-react/dynamic";
+import { server_url } from "../utils/url";
 
 type Errors = {
   name?: string;
@@ -10,6 +11,10 @@ type Errors = {
   confirmPassword?: string;
 };
 
+const Spinner = () => (
+  <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block" />
+);
+
 const Signup = () => {
   const userNameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
@@ -17,18 +22,20 @@ const Signup = () => {
   const confirmPasswordRef = useRef<HTMLInputElement>(null);
 
   const [errors, setErrors] = useState<Errors>({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  // Navigate
   const navigate = useNavigate();
 
-  // password Regex
   const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{6,}$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const formHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const form = e.currentTarget;
+    if (loading) return;
 
+    const form = e.currentTarget;
     const userName = form.userName.value.trim();
     const email = form.email.value.trim();
     const password = form.password.value.trim();
@@ -36,63 +43,49 @@ const Signup = () => {
 
     const newErrors: Errors = {};
 
-    // Name
-    if (userName.length < 2) {
+    if (userName.length < 2)
       newErrors.name = "Name must be at least 2 characters";
-    }
 
-    // Email
-    if (!email.includes("@")) {
+    if (!emailRegex.test(email))
       newErrors.email = "Enter a valid email address";
-    }
 
-    // Password
-    if (!passwordRegex.test(password)) {
-      newErrors.password = "Must include with uppercase & number (6+)";
-    }
+    if (!passwordRegex.test(password))
+      newErrors.password = "6+ chars, 1 uppercase & 1 number";
 
-    // Confirm Password
-    if (password !== confirmPassword) {
+    if (password !== confirmPassword)
       newErrors.confirmPassword = "Passwords do not match";
-    }
 
     setErrors(newErrors);
 
-    // Focus FIRST error only
-    if (newErrors.name) {
-      userNameRef.current?.focus();
-    } else if (newErrors.email) {
-      emailRef.current?.focus();
-    } else if (newErrors.password) {
-      passwordRef.current?.focus();
-    } else if (newErrors.confirmPassword) {
-      confirmPasswordRef.current?.focus();
-    }
+    if (newErrors.name) return userNameRef.current?.focus();
+    if (newErrors.email) return emailRef.current?.focus();
+    if (newErrors.password) return passwordRef.current?.focus();
+    if (newErrors.confirmPassword) return confirmPasswordRef.current?.focus();
 
-    // When form is allow to submit
-    else {
-      try {
-        // Response from backend
-        const response = await fetch("http://localhost:5000/auth/sign-up", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userName, email, password }),
-        });
+    try {
+      setLoading(true);
 
-        const data = await response.json();
+      const response = await fetch(`${server_url}/auth/sign-up`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userName, email, password }),
+      });
 
-        if (data.status == 409) {
-          toast.error(data.error);
-        } else {
-          toast.success(data.message);
-          form.reset();
-          navigate("/");
-        }
-      } catch (err) {
-        console.log(err);
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast.error(data.error || "Signup failed");
+        return;
       }
 
-      // form.reset();
+      toast.success("Account created successfully");
+      form.reset();
+      navigate("/");
+    } catch (err) {
+      toast.error("Server error. Try again later.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -102,73 +95,112 @@ const Signup = () => {
         onSubmit={formHandler}
         className="flex flex-col p-8 bg-white w-[450px] text-black rounded-2xl gap-4 shadow-2xl"
       >
-        <h1 className="text-2xl font-bold text-center mb-8">Create Account</h1>
+        <Link className="bg-blue-500/20 w-fit p-2 rounded-full" to="/">
+          <DynamicIcon name="arrow-left" />
+        </Link>
 
-        {/* Name */}
-        <div className="flex flex-col gap-1">
+        <div>
+          <h1 className="text-2xl font-bold text-center">Create Account</h1>
+          <p className="text-center text-black/70 text-sm">
+            Sign up to access all features
+          </p>
+        </div>
+
+        {/* User Name */}
+        <div>
           <label>User Name</label>
           <input
             ref={userNameRef}
             name="userName"
-            className="border px-2 py-1"
+            disabled={loading}
+            className="border px-2 py-1 w-full"
           />
-          {errors.name && (
-            <span className="text-red-600 text-sm">{errors.name}</span>
-          )}
+          {errors.name && <p className="text-red-600 text-sm">{errors.name}</p>}
         </div>
 
         {/* Email */}
-        <div className="flex flex-col gap-1">
+        <div>
           <label>Email</label>
-          <input ref={emailRef} name="email" className="border px-2 py-1" />
+          <input
+            ref={emailRef}
+            name="email"
+            type="email"
+            autoComplete="email"
+            disabled={loading}
+            className="border px-2 py-1 w-full"
+          />
           {errors.email && (
-            <span className="text-red-600 text-sm">{errors.email}</span>
+            <p className="text-red-600 text-sm">{errors.email}</p>
           )}
         </div>
 
         {/* Password */}
-        <div className="flex flex-col gap-1">
+        <div>
           <label>Password</label>
-          <input
-            ref={passwordRef}
-            type="password"
-            name="password"
-            className="border px-2 py-1"
-          />
+          <div className="relative">
+            <input
+              ref={passwordRef}
+              type={showPassword ? "text" : "password"}
+              name="password"
+              autoComplete="new-password"
+              disabled={loading}
+              className="border px-2 py-1 w-full"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((p) => !p)}
+              className="absolute right-2 top-2"
+            >
+              <DynamicIcon
+                name={showPassword ? "eye-closed" : "eye"}
+                size={20}
+              />
+            </button>
+          </div>
           {errors.password && (
-            <span className="text-red-600 text-sm">{errors.password}</span>
+            <p className="text-red-600 text-sm">{errors.password}</p>
           )}
         </div>
 
         {/* Confirm Password */}
-        <div className="flex flex-col gap-1">
+        <div>
           <label>Confirm Password</label>
           <input
             ref={confirmPasswordRef}
-            type="password"
+            type={showPassword ? "text" : "password"}
             name="confirmPassword"
-            className="border px-2 py-1"
+            disabled={loading}
+            className="border px-2 py-1 w-full"
           />
           {errors.confirmPassword && (
-            <span className="text-red-600 text-sm">
-              {errors.confirmPassword}
-            </span>
+            <p className="text-red-600 text-sm">{errors.confirmPassword}</p>
           )}
         </div>
 
-        <button className="bg-blue-700 text-white p-2 rounded mt-4">
-          Create account
+        <button
+          type="submit"
+          disabled={loading}
+          className="bg-blue-700 text-white p-2 rounded mt-4 flex justify-center items-center gap-2 disabled:opacity-60"
+        >
+          {loading ? (
+            <>
+              <Spinner />
+              Creating...
+            </>
+          ) : (
+            "Create account"
+          )}
         </button>
 
         <p className="text-center text-sm">
           Already have an account?{" "}
-          <Link to="/log-in" className="text-blue-700 underline">
+          <Link to="/auth/log-in" className="text-blue-700 underline">
             Log in
           </Link>
         </p>
       </form>
 
-      <Toaster position="bottom-center"></Toaster>
+      <Toaster position="bottom-center" />
     </section>
   );
 };

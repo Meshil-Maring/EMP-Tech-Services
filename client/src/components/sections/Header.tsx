@@ -49,7 +49,7 @@ const Header = ({ onHome, onServices, onPricing, onContact }: HeaderProps) => {
 
   // Sign up handler
   const sigupHandler = () => {
-    navigate("/sign-up");
+    navigate("/auth/sign-up");
   };
 
   // Log out handler
