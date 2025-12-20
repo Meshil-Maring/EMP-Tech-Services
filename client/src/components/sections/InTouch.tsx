@@ -56,7 +56,7 @@ const InTouch = forwardRef<HTMLDivElement>((_, ref) => {
   return (
     <section
       ref={ref}
-      className="relative pt-40 overflow-hidden bg-slate-950 p-4"
+      className="relative pt-24 overflow-hidden bg-slate-950 p-4"
     >
       {/* Toast */}
       <Toaster position="bottom-center" />
