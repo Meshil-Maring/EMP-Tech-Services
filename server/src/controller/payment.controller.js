@@ -1,15 +1,33 @@
 import razorpay from "../config/razorpay.config.js";
-import verifySignature from "../utils/verify-signature.js";
+import { createTransaction } from "../module/transaction.module.js";
 
 export const createOrder = async (req, res) => {
-  const { amount } = req.body;
+  try {
+    const { amount, plan } = req.body;
 
-  const order = await razorpay.orders.create({
-    amount: amount * 100,
-    currency: "INR",
-  });
+    // create order
+    const order = await razorpay.orders.create({
+      amount: amount * 100,
+      currency: "INR",
+    });
 
-  res.json(order);
+    // save PENDING transaction immediately
+    await createTransaction({
+      orderId: order.id,
+      name: req.user?.name || "Guest",
+      phoneNumber: req.user?.phone || null,
+      date: new Date(),
+      method: null,
+      plan,
+      amount,
+      status: "PENDING",
+    });
+
+    res.status(200).json(order);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Order creation failed" });
+  }
 };
 
 export const verifyPayment = (req, res) => {

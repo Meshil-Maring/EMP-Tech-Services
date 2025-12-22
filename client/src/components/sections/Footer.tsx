@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { DynamicIcon } from "lucide-react/dynamic";
 
-import Logo from "../../assets/EMP_logo.png";
+import Logo from "../../assets/EPM_logo.png";
 import WhatsAppsIcons from "../../assets/icons/WhatsAppIcon";
 
 const footerData = [
@@ -31,7 +31,7 @@ const Footer = () => {
     <footer className="p-8">
       <div className="flex items-center justify-start">
         <img src={Logo} className="w-12" />
-        <h1>EMP Tech Services</h1>
+        <h1>EPM Tech Services</h1>
       </div>
 
       <p className="text-white/60">

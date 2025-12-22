@@ -7,19 +7,19 @@ const clientComments = [
   {
     name: "Sarah Johnson",
     comment:
-      "EMP Tech Services transformed our vision into reality. Their attention to detail and technical expertise is unmatched. Our new platform has increased user engagement by 300%.",
+      "EPM Tech Services transformed our vision into reality. Their attention to detail and technical expertise is unmatched. Our new platform has increased user engagement by 300%.",
     profession: "CEO, TechStart Inc",
   },
   {
     name: "Michael Chen",
     comment:
-      "Working with EMP Tech Services was seamless. They delivered our e-commerce platform ahead of schedule and it exceeded all expectations. Highly recommended!",
+      "Working with EPM Tech Services was seamless. They delivered our e-commerce platform ahead of schedule and it exceeded all expectations. Highly recommended!",
     profession: "Founder, ShopFlow",
   },
   {
     name: "Emily Rodriguez",
     comment:
-      "The team at EMP Tech Services is exceptional. They built a secure, scalable platform that handles millions of transactions. Their post-launch support is outstanding.",
+      "The team at EPM Tech Services is exceptional. They built a secure, scalable platform that handles millions of transactions. Their post-launch support is outstanding.",
     profession: "CTO, FinanceHub",
   },
 ];

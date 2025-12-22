@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 
 import { server_url } from "../../utils/url";
 import { DynamicIcon } from "lucide-react/dynamic";
-import Logo from "../../assets/EMP_logo.png";
+import Logo from "../../assets/EPM_logo.png";
 
 interface HeaderProps {
   onHome: () => void;
@@ -78,7 +78,7 @@ const Header = ({ onHome, onServices, onPricing, onContact }: HeaderProps) => {
       <div className="flex gap-3 items-center">
         <img src={Logo} className="w-10" />
         <p className="text-white font-semibold hidden sm:block">
-          EMP Tech Services
+          EPM Tech Services
         </p>
       </div>
 
