@@ -1,10 +1,11 @@
-const API = "http://localhost:5000/api/payment";
+import { server_url } from "../utils/url";
 
-export const createOrder = async (amount: number) => {
-  const res = await fetch(`${API}/create-order`, {
+export const createOrder = async (data: object) => {
+  const res = await fetch(`${server_url}/api/payment/create-order`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ amount }),
+    body: JSON.stringify({ data }),
   });
+
   return res.json();
 };

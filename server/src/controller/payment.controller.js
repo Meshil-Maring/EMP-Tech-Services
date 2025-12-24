@@ -1,26 +1,32 @@
 import razorpay from "../config/razorpay.config.js";
 import { createTransaction } from "../module/transaction.module.js";
+import verifySignature from "../utils/verify-signature.js";
 
 export const createOrder = async (req, res) => {
   try {
-    const { amount, plan } = req.body;
+    const { data } = req.body;
 
-    // create order
+    console.log(data.amount);
+
+    // Razor pay order
+    const amountInPaise = Number(data.amount) * 100;
+
     const order = await razorpay.orders.create({
-      amount: amount * 100,
+      amount: amountInPaise,
       currency: "INR",
     });
 
     // save PENDING transaction immediately
     await createTransaction({
       orderId: order.id,
-      name: req.user?.name || "Guest",
-      phoneNumber: req.user?.phone || null,
-      email: "",
+      userId: data.userId,
+      name: data.name || "Guest",
+      phoneNumber: data.phone || null,
+      email: data.email,
       date: new Date(),
       method: null,
-      plan,
-      amount,
+      plan: data.plan,
+      amount: data.amount,
       status: "PENDING",
     });
 

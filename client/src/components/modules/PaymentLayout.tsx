@@ -9,13 +9,16 @@ type PaymentLayoutProps = {
     amount: number;
     description: string;
   };
+  userId: string;
 };
 
-const PaymentLayout = ({ onClose, data }: PaymentLayoutProps) => {
+const PaymentLayout = ({ onClose, data, userId }: PaymentLayoutProps) => {
   const [form, setForm] = useState({
+    userId: userId,
     name: "",
     email: "",
     phone: "",
+    plan: data.title,
   });
 
   const isValid =

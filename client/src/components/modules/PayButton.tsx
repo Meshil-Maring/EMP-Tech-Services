@@ -15,6 +15,8 @@ type PayButtonProps = {
     name: string;
     email: string;
     phone: string;
+    userId: string;
+    plan: string;
   };
   disabled: boolean;
 };
@@ -25,9 +27,17 @@ const PayButton = ({ amount, user, disabled }: PayButtonProps) => {
 
     await loadRazorpay();
 
-    // ✅ use actual amount
-    const order = await createOrder(amount);
+    // amount
+    const order = await createOrder({
+      userId: user.userId,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      plan: user.plan,
+      amount,
+    });
 
+    //
     const options = {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
       amount: order.amount,
