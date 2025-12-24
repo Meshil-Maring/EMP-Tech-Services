@@ -75,6 +75,7 @@ const PaymentLayout = ({ onClose, data, userId }: PaymentLayoutProps) => {
             amount={data.amount}
             user={form}
             disabled={!isValid || data.amount === 0}
+            onClose={onClose}
           />
         </div>
       </div>

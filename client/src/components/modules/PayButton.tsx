@@ -2,6 +2,7 @@ import { DynamicIcon } from "lucide-react/dynamic";
 import { createOrder } from "../../api/payment.api";
 import { loadRazorpay } from "../../utils/loadRazorpay";
 import { server_url } from "../../utils/url";
+import toast from "react-hot-toast";
 
 declare global {
   interface Window {
@@ -19,45 +20,73 @@ type PayButtonProps = {
     plan: string;
   };
   disabled: boolean;
+  onClose: () => void;
 };
 
-const PayButton = ({ amount, user, disabled }: PayButtonProps) => {
+const PayButton = ({ amount, user, disabled, onClose }: PayButtonProps) => {
   const pay = async () => {
     if (disabled) return;
 
-    await loadRazorpay();
+    const toastId = toast.loading("Creating payment...");
 
-    // amount
-    const order = await createOrder({
-      userId: user.userId,
-      name: user.name,
-      email: user.email,
-      phone: user.phone,
-      plan: user.plan,
-      amount,
-    });
+    try {
+      await loadRazorpay();
 
-    //
-    const options = {
-      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-      amount: order.amount,
-      currency: "INR",
-      order_id: order.id,
-      handler: async function (res: any) {
-        await fetch(`${server_url}/api/payment/verify`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+      const order = await createOrder({
+        userId: user.userId,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        plan: user.plan,
+        amount,
+      });
+
+      toast.dismiss(toastId);
+
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: order.amount,
+        currency: "INR",
+        order_id: order.id,
+
+        handler: async function (res: any) {
+          try {
+            await fetch(`${server_url}/api/payment/verify`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                ...res,
+                user,
+              }),
+            });
+
+            toast.success("Payment successful 🎉");
+            onClose(); // ✅ close modal
+          } catch (err) {
+            toast.error("Payment verification failed");
+          }
+        },
+
+        modal: {
+          ondismiss: function () {
+            toast.error("Payment cancelled");
           },
-          body: JSON.stringify({
-            ...res,
-            user,
-          }),
-        });
-      },
-    };
+        },
+      };
 
-    new window.Razorpay(options).open();
+      const rzp = new window.Razorpay(options);
+
+      rzp.on("payment.failed", function () {
+        toast.error("Payment failed ❌");
+      });
+
+      rzp.open();
+    } catch (err) {
+      toast.dismiss(toastId);
+      toast.error("Something went wrong");
+    }
   };
 
   return (
