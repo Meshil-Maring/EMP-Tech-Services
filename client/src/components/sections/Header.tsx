@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 
 import { server_url } from "../../utils/url";
 import { DynamicIcon } from "lucide-react/dynamic";
-import Logo from "../../assets/EPM_logo.png";
+import Logo from "../../assets/logo.png";
 
 interface HeaderProps {
   onHome: () => void;
