@@ -21,8 +21,14 @@ const PaymentLayout = ({ onClose, data, userId }: PaymentLayoutProps) => {
     plan: data.title,
   });
 
+  // 👉 amount state (editable only for Enterprise)
+  const [amount, setAmount] = useState<number>(data.amount);
+
   const isValid =
-    form.name.length > 2 && form.email.includes("@") && form.phone.length >= 10;
+    form.name.length > 2 &&
+    form.email.includes("@") &&
+    form.phone.length >= 10 &&
+    amount > 0;
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -44,26 +50,44 @@ const PaymentLayout = ({ onClose, data, userId }: PaymentLayoutProps) => {
         <h2 className="text-xl font-bold text-center">Secure Payment</h2>
         <p className="text-white/60 text-center mb-4">{data.title} Plan</p>
 
+        {/* Amount Section (Design preserved) */}
         <div className="bg-white/10 p-4 rounded-xl text-sm">
-          <div className="flex justify-between">
-            <span>Amount</span>
-            <span>₹ {data.amount}</span>
-          </div>
+          {data.title === "Enterprise" ? (
+            <div className="flex justify-between items-center gap-2">
+              <span>Amount</span>
+              <input
+                type="number"
+                min={1}
+                value={amount}
+                onChange={(e) => setAmount(Number(e.target.value))}
+                className="bg-white/10 p-1 rounded-md text-right w-24"
+              />
+            </div>
+          ) : (
+            <div className="flex justify-between">
+              <span>Amount</span>
+              <span>₹ {data.amount}</span>
+            </div>
+          )}
+
           <p className="text-white/60 mt-2">{data.description}</p>
         </div>
 
+        {/* Form */}
         <div className="flex flex-col gap-3 mt-4">
           <input
             className="bg-white/10 p-2 rounded-md"
             placeholder="Full Name"
             onChange={(e) => setForm({ ...form, name: e.target.value })}
           />
+
           <input
             className="bg-white/10 p-2 rounded-md"
             placeholder="Email"
             type="email"
             onChange={(e) => setForm({ ...form, email: e.target.value })}
           />
+
           <input
             className="bg-white/10 p-2 rounded-md"
             placeholder="Phone"
@@ -72,9 +96,9 @@ const PaymentLayout = ({ onClose, data, userId }: PaymentLayoutProps) => {
           />
 
           <PayButton
-            amount={data.amount}
+            amount={amount}
             user={form}
-            disabled={!isValid || data.amount === 0}
+            disabled={!isValid}
             onClose={onClose}
           />
         </div>
