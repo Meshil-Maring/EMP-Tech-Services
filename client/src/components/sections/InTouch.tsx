@@ -1,5 +1,6 @@
 import { forwardRef, useState } from "react";
 import { Toaster, toast } from "react-hot-toast";
+import { server_url } from "../../utils/url";
 
 const InTouch = forwardRef<HTMLDivElement>((_, ref) => {
   const [loading, setLoading] = useState(false);
@@ -45,30 +46,47 @@ const InTouch = forwardRef<HTMLDivElement>((_, ref) => {
 
     const toastId = toast.loading("Sending your message...");
 
+    // ✅ Abort controller
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+    }, 15000); // 15 seconds
+
     try {
       setLoading(true);
 
-      const res = await fetch("http://localhost:5000/send", {
+      const res = await fetch(`${server_url}/send-mail`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ name, email, type, message }),
+        signal: controller.signal,
       });
 
+      clearTimeout(timeoutId);
+
       if (!res.ok) {
-        throw new Error("Failed to send message");
+        throw new Error("Server error");
       }
 
-      toast.success("Message sent! I’ll reply within 24–48 hours 🚀", {
+      toast.success("Message sent! I’ll reply within 24–48 hours", {
         id: toastId,
       });
 
       form.reset();
-    } catch (error) {
-      toast.error("Something went wrong. Please try again later ❌", {
-        id: toastId,
-      });
+    } catch (error: any) {
+      clearTimeout(timeoutId);
+
+      if (error.name === "AbortError") {
+        toast.error("Request timed out. Please try again later", {
+          id: toastId,
+        });
+      } else {
+        toast.error("Something went wrong. Please try again", {
+          id: toastId,
+        });
+      }
     } finally {
       setLoading(false);
     }

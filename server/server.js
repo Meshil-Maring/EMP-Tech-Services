@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import session from "express-session";
 import dotenv from "dotenv";
-import Razorpay from "razorpay";
 
 import { isAuth } from "./src/middleware/isAuth.js";
 import usersRoute from "./src/routes/users.js";
@@ -44,7 +43,7 @@ app.get("/api/check-auth", isAuth, (req, res) => {
 });
 
 // Public route
-app.post("/send", intouchSendEmail);
+app.post("/send-mail", intouchSendEmail);
 
 app.use("/api/payment", paymentRoutes);
 

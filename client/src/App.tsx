@@ -7,7 +7,7 @@ import Transaction from "./pages/Transaction";
 import ProtectedRoute from "./routes/ProtectedRoute";
 
 import AboutUs from "./pages/footer/About-us";
-import Careers from "./pages/footer/Careers";
+// import Careers from "./pages/footer/Careers";
 import ServiceFAQs from "./pages/footer/ServiceFAQ";
 import Web from "./pages/footer/Web";
 import DevelopmentServices from "./pages/footer/DevelopmentServices";
