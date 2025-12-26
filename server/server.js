@@ -12,7 +12,7 @@ import paymentRoutes from "./src/routes/payment.routes.js";
 dotenv.config();
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 app.use(
   cors({
@@ -47,4 +47,6 @@ app.post("/send-mail", intouchSendEmail);
 
 app.use("/api/payment", paymentRoutes);
 
-app.listen(PORT, () => console.log("Server running on", PORT));
+app.listen(PORT, () => {
+  console.log("Server running on port", PORT);
+});
