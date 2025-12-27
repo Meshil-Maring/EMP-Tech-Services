@@ -37,13 +37,11 @@ app.use(
 app.use((req, res, next) => {
   res.setHeader(
     "Content-Security-Policy",
-    `
-    default-src 'self';
-    connect-src 'self' https://epm-tech-service.onrender.com https://epmtechservice.com https://www.epmtechservice.com;
-    img-src 'self' data: https:;
-    style-src 'self' 'unsafe-inline';
-    script-src 'self' 'unsafe-inline';
-    `
+    "default-src 'self'; " +
+      "connect-src 'self' https://epm-tech-service.onrender.com https://epmtechservice.com https://www.epmtechservice.com; " +
+      "img-src 'self' data: https:; " +
+      "style-src 'self' 'unsafe-inline'; " +
+      "script-src 'self' 'unsafe-inline';"
   );
   next();
 });
